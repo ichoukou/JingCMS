@@ -113,7 +113,7 @@ function cancelTreeCheckBoxSelect(id){
 //初始化普通列表分页
 function initPagination($scope,$http){
     initPageInfo($scope);
-    getPageInfos($scope,$http,$scope.listUrl,'normalList');    
+    getPageInfos($scope,$http,$scope.url+'list','normalList');    
     //getPageInfos($scope,$http,"/admin/manage/getDocumentList/"+$('#currentCate').val(),'normalList');
 }
 
@@ -286,7 +286,7 @@ function initDelOption($scope,$http,info){
     $scope.delOneItem = function(id){
         initCheckIfDo($scope,id,info,function(currentID){
             //angularHttpGet($http,"/admin/manage/"+$('#currentCate').val()+"/del?uid="+currentID,function(){
-            angularHttpGet($http,$scope.delUrl+"?ids="+currentID,function(){
+            angularHttpGet($http,$scope.url+"del?id="+currentID,function(){
                 initPagination($scope,$http);
             });
         });
@@ -301,7 +301,7 @@ function initDelOption($scope,$http,info){
         var targetIds = $('#targetIds').val();
         if(targetIds && targetIds.split(',').length > 0){
             initCheckIfDo($scope,$('#targetIds').val(),info,function(currentID){
-                angularHttpGet($http,$scope.delUrl+"?ids="+currentID+"&expandIds="+$('#expandIds').val(),function(){
+                angularHttpGet($http,$scope.url+"del?id="+currentID+"&expandIds="+$('#expandIds').val(),function(){
                     initPagination($scope,$http);
                 });
             });

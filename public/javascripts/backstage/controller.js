@@ -33,7 +33,8 @@ jingApp.controller("mainPanel",['$scope','$http',function($scope,$http){
 
 
 //文档列表
-jingApp.controller('contentList',['$scope','$http',function($scope,$http){
+jingApp.controller('article',['$scope','$http',function($scope,$http){
+    $scope.url='/admin/manage/article/';
     $scope.formData = {};
     //获取文档列表信息
     initPagination($scope,$http);
@@ -52,12 +53,8 @@ jingApp.controller("adminUserList",['$scope','$http','pageData','getItemService'
     $scope.formData = {};
 
     //获取管理员列表信息
-    $scope.listUrl="/admin/manage/adminUser/list/";
-    $scope.getUrl="/admin/manage/adminUser/get/";
-    $scope.saveUrl="/admin/manage/adminUser/save/";
-    $scope.delUrl="/admin/manage/adminUser/del/";
-    $scope.batchDelUrl="/admin/manage/adminUser/batchDel/";
-
+    $scope.url="/admin/manage/adminUser/";
+    
     initPagination($scope,$http);
 
     //删除用户
@@ -80,9 +77,8 @@ jingApp.controller("adminUserList",['$scope','$http','pageData','getItemService'
         var editId = obj.data('whatever');
         // 如果不为空则为编辑状态
         if(editId){
-            console.log(editId);
             //getItemService.itemInfo(pageData.bigCategory,editId).success(function(result){
-            $http.get($scope.getUrl+editId).success(function(result){
+            $http.get($scope.url+'get/'+editId).success(function(result){
                 $scope.formData = result;
                 $scope.targetID = editId;
                 //initTreeDataByType($scope,$http,'adminGroup');
@@ -110,7 +106,7 @@ jingApp.controller("adminUserList",['$scope','$http','pageData','getItemService'
                 }
             });
         }else{
-            angularHttpPost($http,isValid,$scope.saveUrl,$scope.formData,function(data){
+            angularHttpPost($http,isValid,$scope.url+'save/',$scope.formData,function(data){
                 initPagination($scope,$http);
             });
         }
@@ -125,10 +121,7 @@ jingApp.controller("adminGroup",['$scope','$http','pageData','getItemService',fu
     $scope.formData.power = {};
     $scope.checkInfo = {};
 
-    $scope.listUrl="/admin/manage/adminGroup/list/";
-    $scope.getUrl="/admin/manage/adminGroup/get/";
-    $scope.saveUrl="/admin/manage/adminGroup/save/";
-    $scope.delUrl="/admin/manage/adminGroup/del";
+    $scope.url="/admin/manage/adminGroup/";
  
     //获取管理员用户组列表
     initPagination($scope,$http);
@@ -146,7 +139,7 @@ jingApp.controller("adminGroup",['$scope','$http','pageData','getItemService',fu
         if(editId){
             modalTitle.text("编辑用户组");
 
-        $http.get($scope.getUrl+editId).success(function(result){
+        $http.get($scope.url+'get/'+editId).success(function(result){
                 $scope.formData.id=result.id;
                 $scope.formData.name = result.name;
                 if(result.power){
@@ -183,7 +176,7 @@ jingApp.controller("adminGroup",['$scope','$http','pageData','getItemService',fu
             name : $scope.formData.name,
             power : JSON.stringify($scope.formData.power)
         };
-        angularHttpPost($http,isValid,$scope.saveUrl,groupData,function(data){
+        angularHttpPost($http,isValid,$scope.url+"save/",groupData,function(data){
             initPagination($scope,$http,listurl);
         });
     }
@@ -458,10 +451,7 @@ jingApp.controller("backUpData",['$scope','$http',function($scope,$http){
 
 //系统日志
 jingApp.controller("systemLogs",['$scope','$http',function($scope,$http){
-    var cate = "systemLog";
-    //var cate = $('#currentCate').val();
-    $scope.listUrl="/admin/manage/"+cate+"/list/";
-    $scope.delUrl="/admin/manage/"+cate+"/del/";
+    $scope.url="/admin/manage/systemLog/";
  
     // 初始化名称和权限
     $scope.formData = {};
@@ -515,7 +505,7 @@ jingApp.controller("addContent",['$scope','$http','pageData','getItemService',fu
             });
         }else{
             angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
-                window.location = "/admin/manage/contentList";
+                window.location = "/admin/manage/articleList";
             });
         }
 

@@ -4,6 +4,8 @@ var url = require('url');
 
 var Util = require('../util/Util');
 var adminFunc = require('../service/adminFunc');
+var adminUserFunc = require('../service/adminUserFunc');
+var adminGroupFunc = require('../service/adminGroupFunc');
 var articleFunc = require('../service/articleFunc');
 var systemLogFunc = require('../service/systemLogFunc');
 
@@ -125,11 +127,30 @@ var returnAdminRouter = function(io) {
         }else{
             return res.json({});
         }
-
     });
 
-    //系统管理员用户组列表
-    router.get('/manage/adminUser/list/:defaultUrl', function(req, res, next) {
+    router.get('/manage/adminUser/del?:defaultUrl', function(req, res, next) {
+        var params = url.parse(req.url,true);
+        var ids = [];
+        var id = params.query.id;
+        if(id){
+            var ss = id.split(',');
+            for(var i in ss){
+                ids.push(ss[i]);
+            }
+        }
+        console.log(ids);
+        adminUserFunc.del(ids,function (err) {
+            if(err){
+                res.end(err);
+            }else{
+                res.end("success");
+            }
+        });
+    });
+
+    //系统管理员列表
+    router.get('/manage/adminUser/list?:defaultUrl', function(req, res, next) {
         //TODO:check permission
         if(true){
             var params = url.parse(req.url,true);
@@ -195,28 +216,33 @@ var returnAdminRouter = function(io) {
 
 //------------------------------------------用户组管理面开始
 
+    router.get('/manage/adminGroup/del?:defaultUrl', function(req, res, next) {
+        var params = url.parse(req.url,true);
+        var ids = [];
+        var id = params.query.id;
+        if(id){
+            var ss = id.split(',');
+            for(var i in ss){
+                ids.push(ss[i]);
+            }
+        }
+        adminGroupFunc.del(ids,function (err) {
+            if(err){
+                res.end(err);
+            }else{
+                res.end("success");
+            }
+        });
+    });
+
+
 //系统用户组管理（list）
 router.get('/manage/adminGroup', function(req, res, next) {
     adminFunc.renderToManagePage(req, res,'manage/adminGroup',settings.ADMINGROUPLIST);
 });
 
 //系统管理员用户组列表
-router.get('/manage/adminGroup/list/', function(req, res, next) {
-    //TODO:check permission
-    if(true){
-        adminFunc.allAdminGroup(function (err,result) {
-            if(err){
-                res.next(err);
-            }else{
-                return res.json(result);
-            }
-        });
-    }else{
-        return res.json({});
-    }
-});
-
-router.get('/manage/adminGroup/list/:defaultUrl',function (req,res,next) {    
+router.get('/manage/adminGroup/list?:defaultUrl',function (req,res,next) {    
     //TODO:check permission
     if(true){
         var params = url.parse(req.url,true);
@@ -313,21 +339,29 @@ router.get('/manage/backupDataManage/backUp', function(req, res, next) {
 
 //------------------------------------------系统日志管理开始
 
-router.get('/manage/systemLogs', function(req, res, next) {
+router.get('/manage/systemLog', function(req, res, next) {
     adminFunc.renderToManagePage(req, res,'manage/systemLogs',settings.SYSTEMLOGS);
 });
-router.get('/manage/systemLog/del/:key', function(req, res, next) {
-    var id = Number(req.params.key);
-    systemLogFunc.del(id,function (err) {
+
+router.get('/manage/systemLog/del?:defaultUrl', function(req, res, next) {
+    var params = url.parse(req.url,true);
+    var ids = [];
+    var id = params.query.id;
+    if(id){
+        var ss = id.split(',');
+        for(var i in ss){
+            ids.push(ss[i]);
+        }
+    }
+    systemLogFunc.del(ids,function (err) {
         if(err){
             res.end(err);
         }else{
             res.end("success");
         }
     });
-    adminFunc.renderToManagePage(req, res,'manage/systemLogs',settings.SYSTEMLOGS);
 });
-router.get('/manage/systemLog/list/:defaultUrl', function(req, res, next) {
+router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
     //TODO:check permission
     if(true){
         var params = url.parse(req.url,true);
@@ -359,16 +393,39 @@ router.get('/manage/systemLog/list/:defaultUrl', function(req, res, next) {
 
 //------------------------------------------文档管理面开始
     //文档列表页面
-    router.get('/manage/contentList', function(req, res, next) {
-        adminFunc.renderToManagePage(req, res,'manage/contentList',settings.CONTENTLIST);
+    router.get('/manage/article', function(req, res, next) {
+        adminFunc.renderToManagePage(req, res,'manage/article',settings.CONTENTLIST);
     });
 
+    //文档列表
+    router.get('/manage/article/list?:defaultUrl',function (req,res,next) {
+        var params = url.parse(req.url,true);
+        var keywords = params.query.searchKey;
+        var area = params.query.area;
+        var limit = Number(params.query.limit);
+        var currentPage = Number(params.query.currentPage);
+        var startNum = (currentPage - 1)*limit ;
+
+        articleFunc.list(startNum,limit,function (docs) {
+            var pageInfo = {
+                "totalItems" : docs.length,
+                "currentPage" : currentPage,
+                "limit" : limit,
+                "startNum" : startNum,
+            };
+            return res.json({
+                docs : docs,
+                pageInfo : pageInfo
+            });
+        });
+    }
+
     //文档添加页面(默认)
-    router.get('/manage/content/add/:key', function(req, res, next) {
-        var contentType = req.params.key;
+    router.get('/manage/article/add/:key', function(req, res, next) {
+        var articleType = req.params.key;
         var targetPath;
 
-        if(contentType == "plug"){
+        if(articleType == "plug"){
             targetPath = 'manage/addPlugs';
         }else{
             targetPath = 'manage/addContent';
@@ -377,9 +434,9 @@ router.get('/manage/systemLog/list/:defaultUrl', function(req, res, next) {
     });
 
     //文档添加页面(默认)
-    router.post('/manage/content/addOne', function(req, res, next) {
-        var content = req.body;
-        articleFunc.save(content,function(err){
+    router.post('/manage/article/save/', function(req, res, next) {
+        var article = req.body;
+        articleFunc.save(article,function(err){
             if(err){
                 res.end(err);
             }else{
@@ -390,13 +447,13 @@ router.get('/manage/systemLog/list/:defaultUrl', function(req, res, next) {
 
 //------------------------------------------文档分类管理开始
     //文档类别列表页面
-    router.get('/manage/contentCategorys', function(req, res, next) {
-        adminFunc.renderToManagePage(req, res,'manage/contentCategorys',settings.CONTENTCATEGORYS);
+    router.get('/manage/articleCategorys', function(req, res, next) {
+        adminFunc.renderToManagePage(req, res,'manage/articleCategorys',settings.CONTENTCATEGORYS);
     });
 
     //文档添加类别
-    router.post('/manage/contentCategory/addCate', function(req, res, next) {
-        console.log("contentCategory/addCate");
+    router.post('/manage/articleCategory/addCate', function(req, res, next) {
+        console.log("articleCategory/addCate");
         articleFunc.saveCate(req,function(err){
             if(err){
                 res.end(err);
@@ -407,10 +464,10 @@ router.get('/manage/systemLog/list/:defaultUrl', function(req, res, next) {
     });
 
     //文档
-    router.post('/manage/contentCategory/getCate', function(req, res, next) {
+    router.post('/manage/articleCategory/getCate', function(req, res, next) {
         var params = url.parse(req.url,true);
         var id = params.query.id;
-        console.log("contentCategory/getCate");
+        console.log("articleCategory/getCate");
         articleFunc.getCate(id,function(cate){
             if(cate){
                 res.json(cate);
@@ -421,7 +478,7 @@ router.get('/manage/systemLog/list/:defaultUrl', function(req, res, next) {
     });
 
     //文章类别列表
-    router.get('/manage/contentCategorys/list', function(req, res, next) {
+    router.get('/manage/articleCategorys/list', function(req, res, next) {
         articleFunc.listCate(function(cates){
             if(cates){
                 res.json(cates);
@@ -434,14 +491,14 @@ router.get('/manage/systemLog/list/:defaultUrl', function(req, res, next) {
 //------------------------------------------文档标签开始
 
 //文档标签管理（list）
-router.get('/manage/contentTags', function(req, res, next) {
+router.get('/manage/articleTags', function(req, res, next) {
 
-    adminFunc.renderToManagePage(req, res,'manage/contentTags',settings.CONTENTTAGS);
+    adminFunc.renderToManagePage(req, res,'manage/articleTags',settings.CONTENTTAGS);
 
 });
 
 //所有标签列表
-router.get('/manage/contentTags/list', function(req, res, next) {
+router.get('/manage/articleTags/list', function(req, res, next) {
     if(adminFunc.checkAdminPower(req,settings.CONTENTTAGS[0] + '_view')){
         Util.findAll(ContentTags,req, res,"request ContentTags List")
     }else{
@@ -457,9 +514,9 @@ router.get('/manage/contentTags/list', function(req, res, next) {
 //文档模板管理（list）
 
     //模板配置
-    router.get('/manage/contentTemps/m/config', function(req, res, next) {
+    router.get('/manage/articleTemps/m/config', function(req, res, next) {
 
-        adminFunc.renderToManagePage(req, res,'manage/contentTemps',settings.CONTENTTEMPSCONFIG);
+        adminFunc.renderToManagePage(req, res,'manage/articleTemps',settings.CONTENTTEMPSCONFIG);
 
     });
 

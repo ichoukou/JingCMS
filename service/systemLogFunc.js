@@ -8,8 +8,8 @@ module.exports =  {
         	cb(docs);
 		});
     },
-    del:function (logid,cb) {
-        global.db.models.systemlog.find({id:logid}).remove(cb);
+    del:function (ids,cb) {
+        global.db.models.systemlog.find({id:ids}).remove(cb);
     },
     save:function (content,cb) {
     	global.db.models.systemlog.create({content:content},cb);
