@@ -1,11 +1,11 @@
 <div class="row" ng-controller="contentnotices">
-    <% include public/modal %>
+    <% include public/modal.html %>
     <div class="col-xs-12">
         <div class="panel">
             <a ng-click="batchIsRead()" role="button" class="btn btn-primary btn-sm"><span class="fa fa-fw fa-cloud" aria-hidden="true">&nbsp;</span>标记选中为已读</a>
-            <% include public/tableTool %>
+            <% include public/tableTool.html %>
             <div class="pull-right">
-                <% include public/searchBox %>
+                <% include public/searchBox.html %>
             </div>
         </div>
         <div class="box">
@@ -27,7 +27,7 @@
                 </table>
 
             </div><!-- /.box-body -->
-            <% include public/tableFooter %>
+            <% include public/tableFooter.html %>
         </div><!-- /.box -->
 
     </div><!-- /.col -->

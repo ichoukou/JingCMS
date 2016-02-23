@@ -28,7 +28,7 @@ var adminFunc = {
          global.db.models.adminuser.count(function (err,adminCount) {
              global.db.models.user.count(function (err,userCount) {
                  global.db.models.article.count(function (err,articleCount) {
-                     global.db.models.comment.count(function (err,commentCount) {
+                     global.db.models.articlecomment.count(function (err,commentCount) {
                          global.db.models.user.find({},["name", "Z"],function (err,users) {
                                     return res.json({
                                         adminUserCount : adminCount,

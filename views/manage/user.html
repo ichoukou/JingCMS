@@ -1,10 +1,10 @@
-﻿<div class="row" ng-controller="regUsersList" >
-	<% include public/modal %>
+﻿<div class="row" ng-controller="user" >
+	<% include public/modal.html %>
     <div class="col-xs-12">
         <div class="panel">
-            <% include public/tableTool %>
+            <% include public/tableTool.html %>
             <div class="pull-right">
-                <% include public/searchBox %>
+                <% include public/searchBox.html %>
             </div>
         </div>
         <div class="box">
@@ -22,7 +22,7 @@
                     </tr>
 
                     <tr class="datalist" ng-repeat="user in data">
-                        <td><input type="checkbox" name="listItem" class="mini" value="{{user._id}}" ng-click="getNewIds()"/></td>
+                        <td><input type="checkbox" name="listItem" class="mini" value="{{user.id}}" ng-click="getNewIds()"/></td>
                         <td class="  sorting_1">{{user.userName}}</td>
                         <td ng-switch on="user.group">
                             <span ng-switch-when="0">普通用户</span>
@@ -33,13 +33,13 @@
                         <td class=" ">{{user.email}}</td>
                         <td class=" ">{{user.date | date : "yyyy-MM-dd HH:mm:ss"}}</td>
                         <td class=" ">
-                            <button class="btn btn-primary btn-xs" data-whatever="{{user._id}}" data-toggle="modal" data-target="#addNewRegUser"><span class="fa fa-fw fa-edit" aria-hidden="true"></span>编辑</button>&nbsp;
-                            <button class="btn btn-default btn-xs" ng-click="delOneItem(user._id)"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
+                            <button class="btn btn-primary btn-xs" data-whatever="{{user.id}}" data-toggle="modal" data-target="#addNewRegUser"><span class="fa fa-fw fa-edit" aria-hidden="true"></span>编辑</button>&nbsp;
+                            <button class="btn btn-default btn-xs" ng-click="delOneItem(user.id)"><span class="fa fa-fw fa-trash-o" aria-hidden="true"></span>删除</button>
                         </td>
                     </tr>
                 </table>
             </div><!-- /.box-body -->
-            <% include public/tableFooter %>
+            <% include public/tableFooter.html %>
         </div><!-- /.box -->
 
     </div><!-- /.col -->

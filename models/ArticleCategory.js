@@ -8,7 +8,6 @@ module.exports = function (db, cb) {
         parentID : { type: "text", default: "0" },
         state : { type: "text", default: "1" },  //是否公开 默认公开
         date: { type: "date", default: Date.now },
-        contentTemp : { type: "text", default:"" }, // 内容模板
         defaultUrl : { type: "text", default: "" }, // 父类别的默认目录
         homePage : { type: "text", default: "ui" }, // 必须唯一
         sortPath : { type: "text", default: "0" }, //存储所有父节点结构

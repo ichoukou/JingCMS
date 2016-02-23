@@ -505,7 +505,7 @@ jingApp.controller("addContent",['$scope','$http','pageData','getItemService',fu
             });
         }else{
             angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
-                window.location = "/admin/manage/articleList";
+                window.location = "/admin/manage/article/";
             });
         }
 
@@ -530,7 +530,7 @@ jingApp.controller("addContent",['$scope','$http','pageData','getItemService',fu
             });
         }else{
             angularHttpPost($http,true,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
-                window.location = "/admin/manage/contentList";
+                window.location = "/admin/manage/article/list";
             });
         }
 
@@ -585,7 +585,7 @@ jingApp.controller("addPlugs",['$scope','$http','pageData','getItemService',func
             });
         }else{
             angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
-                window.location = "/admin/manage/contentList";
+                window.location = "/admin/manage/article/list";
             });
         }
     }
@@ -593,7 +593,7 @@ jingApp.controller("addPlugs",['$scope','$http','pageData','getItemService',func
 
 
 //类别管理
-jingApp.controller('contentCategorys',['$scope','$http','pageData','getItemService', function ($scope,$http,pageData,getItemService) {
+jingApp.controller('articleCategory',['$scope','$http','pageData','getItemService', function ($scope,$http,pageData,getItemService) {
     // 初始化系统模板树
     initTreeDataByType($scope,$http,"tempTree");
     // 数据初始化
@@ -619,7 +619,7 @@ jingApp.controller('contentCategorys',['$scope','$http','pageData','getItemServi
             $('#askifdo').modal("show");
         }else{
             var currentID =  $scope.targetID;
-            angularHttpGet($http,"/admin/manage/"+pageData.bigCategory+"/del?uid="+currentID,function(){
+            angularHttpGet($http,"/admin/manage/articleCategory/del?id="+currentID,function(){
                 getCategoryData($scope,$http);
             });
         }
@@ -656,7 +656,7 @@ jingApp.controller('contentCategorys',['$scope','$http','pageData','getItemServi
             }
             else if(opt === "editNc"){
                 modalTitle.text("编辑分类");
-                var requestPath = "/admin/manage/contentCategory/getCate?id="+currentID;
+                var requestPath = "/admin/manage/articleCategory/get?id="+currentID;
                 $http.get(requestPath).success(function(result){
                     $scope.formData = result;
                     $scope.targetID = currentID;
@@ -687,14 +687,14 @@ jingApp.controller('contentCategorys',['$scope','$http','pageData','getItemServi
         // angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
         //     getCategoryData($scope,$http);
         // });
-        angularHttpPost($http,isValid,'/admin/manage/contentCategory/addCate',$scope.formData,function(data){
+        angularHttpPost($http,isValid,'/admin/manage/articleCategory/addCate',$scope.formData,function(data){
             getCategoryData($scope,$http);
         });
     }
 }]);
 
 //文档标签
-jingApp.controller("contentTags",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
+jingApp.controller("articleTag",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
     //初始化名称和权限
     $scope.formData = {};
     //获取标签列表
@@ -860,16 +860,18 @@ jingApp.controller("contentTempEdit",['$scope','$http',function($scope,$http){
 
 
 //留言管理
-jingApp.controller("messageList",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
+jingApp.controller("articleComment",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
     // 初始化名称和权限
     $scope.formData = {};
     $scope.repFormData = {};
+    $scope.url = "/admin/manage/articleComment/";
+
     //获取留言列表
     initPagination($scope,$http);
     //删除留言
     $scope.delMsgsItem = function(id){
         initCheckIfDo($scope,id,'您确认要删除该条留言吗？',function(currentID){
-            angularHttpGet($http,"/admin/manage/"+pageData.bigCategory+"/del?uid="+currentID,function(){
+            angularHttpGet($http,$scope.url+"del?uid="+currentID,function(){
                 initPagination($scope,$http);
             });
         });
@@ -899,7 +901,7 @@ jingApp.controller("messageList",['$scope','$http','pageData','getItemService',f
 
     // 留言回复
     $scope.repMsgForm = function(isValid){
-        angularHttpPost($http,isValid,'/admin/manage/'+pageData.bigCategory+'/addOne',$scope.repFormData,function(data){
+        angularHttpPost($http,isValid,$scope.url+"addOne",$scope.repFormData,function(data){
             initPagination($scope,$http);
         });
     }
@@ -910,11 +912,13 @@ jingApp.controller("messageList",['$scope','$http','pageData','getItemService',f
 jingApp.controller("contentnotices",['$scope','$http',function($scope,$http){
     // 初始化名称和权限
     $scope.formData = {};
+    $scope.url="/admin/manage/articleComment/";
+
     //获取公告列表
     initPagination($scope,$http);
+
     //删除公告
     initDelOption($scope,$http,'您确认要删除选中的公告吗？');
-
 }]);
 
 //添加新公告
@@ -940,6 +944,7 @@ jingApp.controller("addNotice",['$scope','$http','pageData','getItemService',fun
 jingApp.controller("contentnotices",['$scope','$http',function($scope,$http){
     // 初始化名称和权限
     $scope.formData = {};
+    $scope.url="/admin/manage/notice/";
     //获取公告列表
     initPagination($scope,$http);
     //删除公告
@@ -958,8 +963,9 @@ jingApp.controller("contentnotices",['$scope','$http',function($scope,$http){
 }]);
 
 //会员管理
-jingApp.controller("regUsersList",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
+jingApp.controller("user",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
     $scope.formData = {};
+    $scope.url="/admin/manage/user/";
     //获取注册用户列表信息
     initPagination($scope,$http);
     //删除用户

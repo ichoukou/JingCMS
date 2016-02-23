@@ -1,7 +1,8 @@
 var orm = require('orm');
 
 module.exports =  {
-    search: function (searchKey,startNum,limit,cb) {
+    list: function (startNum,limit,cb) {
+        var searchKey='';
         global.db.models.article.find({content:orm.like("%"+searchKey+"%")}).limit(limit).offset(startNum).run(function (err, docs) {
         	if(err)
         		console.log(err);
@@ -13,7 +14,6 @@ module.exports =  {
     },
     saveCate:function (req,cb) {
     	var content = req.body;
-        console.log(content);
         var artCate = new global.db.models.article_category(content);
     	artCate.save(cb);
     },
@@ -31,4 +31,13 @@ module.exports =  {
             cb(cate);
         });
     },
+    listComment:function (startNum,limit,cb) {
+        var searchKey='';
+        global.db.models.articlecomment.find({content:orm.like("%"+searchKey+"%")}).limit(limit).offset(startNum).run(function (err, docs) {
+            if(err)
+                console.log(err);
+            cb(docs);
+        });
+    },
+
 };

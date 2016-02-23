@@ -24,7 +24,7 @@ module.exports = function (){
             console.log(err);
         });
 
-        db.load('./Comment',function (err) {
+        db.load('./ArticleComment',function (err) {
             console.log(err);
         });
 
@@ -35,22 +35,33 @@ module.exports = function (){
             db.models.systemlog.sync(function () {});
         });
 
+        //系统提醒
+        db.load('./Notice',function (err) {
+            if(err)
+                console.log(err);
+            db.models.notice.sync(function () {});
+        });
+
+
+        //用户评论关系
+        db.models.articlecomment.hasOne("author", db.models.user);
+        db.models.articlecomment.hasOne("article", db.models.article);
+        db.models.articlecomment.hasOne("replayauthor", db.models.user);
+        db.models.articlecomment.hasOne("adminauthor", db.models.adminuser);
+        db.models.articlecomment.sync(function () {});
+
+
         var User    = db.models.user;
         var Article = db.models.article;
-        var Comment = db.models.comment;
 
         //define relationships
         Article.hasOne('author', User);
-        Comment.hasOne('author', User);
-        Comment.hasOne('article', Article);
 
         User.sync(function () {});
 
         Article.sync(function () {
         });
 
-        Comment.sync(function () {
-        });
         db.models.adminuser.sync(function () {
         });
         db.models.article_category.sync(function () {

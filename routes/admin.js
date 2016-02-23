@@ -8,6 +8,7 @@ var adminUserFunc = require('../service/adminUserFunc');
 var adminGroupFunc = require('../service/adminGroupFunc');
 var articleFunc = require('../service/articleFunc');
 var systemLogFunc = require('../service/systemLogFunc');
+var noticeFunc = require('../service/noticeFunc');
 
 //文件操作
 var PW = require('png-word');
@@ -215,7 +216,6 @@ var returnAdminRouter = function(io) {
 
 
 //------------------------------------------用户组管理面开始
-
     router.get('/manage/adminGroup/del?:defaultUrl', function(req, res, next) {
         var params = url.parse(req.url,true);
         var ids = [];
@@ -371,7 +371,7 @@ router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
         var currentPage = Number(params.query.currentPage);
         var startNum = (currentPage - 1)*limit ;
 
-        systemLogFunc.listSystemLog(startNum,limit,function (docs) {
+        systemLogFunc.list(startNum,limit,function (docs) {
             var pageInfo = {
                 "totalItems" : docs.length,
                 "currentPage" : currentPage,
@@ -390,15 +390,32 @@ router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
 
 //------------------------------------------系统日志管理结束
 
+//----------------文章管理开始-------------------
+router.get('/manage/article', function(req, res, next) {
+    adminFunc.renderToManagePage(req, res,'manage/article',settings.CONTENTLIST);
+});
 
-//------------------------------------------文档管理面开始
-    //文档列表页面
-    router.get('/manage/article', function(req, res, next) {
-        adminFunc.renderToManagePage(req, res,'manage/article',settings.CONTENTLIST);
+router.get('/manage/article/del?:defaultUrl', function(req, res, next) {
+    var params = url.parse(req.url,true);
+    var ids = [];
+    var id = params.query.id;
+    if(id){
+        var ss = id.split(',');
+        for(var i in ss){
+            ids.push(ss[i]);
+        }
+    }
+    articleFunc.del(ids,function (err) {
+        if(err){
+            res.end(err);
+        }else{
+            res.end("success");
+        }
     });
-
-    //文档列表
-    router.get('/manage/article/list?:defaultUrl',function (req,res,next) {
+});
+router.get('/manage/article/list?:defaultUrl', function(req, res, next) {
+    //TODO:check permission
+    if(true){
         var params = url.parse(req.url,true);
         var keywords = params.query.searchKey;
         var area = params.query.area;
@@ -418,10 +435,130 @@ router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
                 pageInfo : pageInfo
             });
         });
+    }else{
+        return res.json({});
     }
+});
+
+
+//文档留言管理（list）
+    router.get('/manage/articleComment', function(req, res, next) {
+        adminFunc.renderToManagePage(req, res,'manage/articleComment',settings.MESSAGEMANAGE);
+    });
+
+    //文档留言管理（list）
+    router.get('/manage/articleComment/list?:defaultUrl', function(req, res, next) {
+        //TODO:check permission
+        if(true){
+            var params = url.parse(req.url,true);
+            var keywords = params.query.searchKey;
+            var area = params.query.area;
+            var limit = Number(params.query.limit);
+            var currentPage = Number(params.query.currentPage);
+            var startNum = (currentPage - 1)*limit ;
+
+            articleFunc.listComment(startNum,limit,function (docs) {
+                var pageInfo = {
+                    "totalItems" : docs.length,
+                    "currentPage" : currentPage,
+                    "limit" : limit,
+                    "startNum" : startNum,
+                };
+                return res.json({
+                    docs : docs,
+                    pageInfo : pageInfo
+                });
+            });
+        }else{
+            return res.json({});
+        }
+    });
+
+
+//管理员回复用户
+    function replyMessage(req,res){
+        var errors;
+        var contentId = req.body.contentId;
+        var contentTitle = req.body.contentTitle;
+        var adminAuthorId = req.session.adminUserInfo._id;
+        var replyId = req.body.replyId;
+        var replyEmail = req.body.replyEmail;
+        var content = req.body.content;
+        var utype = req.body.utype;
+        var relationMsgId = req.body.relationMsgId;
+
+        if(!shortid.isValid(contentId) || !contentTitle){
+            errors = settings.system_illegal_param;
+        }
+        if(!adminAuthorId || !replyId){
+            errors = settings.system_illegal_param;
+        }
+        if(replyEmail && !validator.isEmail(replyEmail)){
+            errors = settings.system_illegal_param;
+        }
+
+
+        if(errors){
+            res.end(errors);
+        }else{
+
+            req.body.adminAuthor = new AdminUser({_id : adminAuthorId , userName : req.session.adminUserInfo.userName});
+            req.body.replyAuthor = new User({_id : replyId , email : replyEmail});
+            var newMsg = new Message(req.body);
+            newMsg.save(function(){
+
+//              更新评论数
+                Content.updateCommentNum(contentId,'add',function(){
+//                给用户发送提醒邮件
+                    system.sendEmail(settings.email_notice_user_contentMsg,newMsg,function(err){
+                        if(err){
+                            res.end(err);
+                        }
+                    });
+
+                    res.end("success");
+                });
+
+            });
+
+        }
+    }
+//------------------------------------------文档留言结束
+
+
+
+
+//------------------------------------------文档管理面开始
+    //文档列表页面
+    router.get('/manage/user', function(req, res, next) {
+        adminFunc.renderToManagePage(req, res,'manage/user',settings.REGUSERSLIST);
+    });
+
+    //文档列表
+    router.get('/manage/user/list?:defaultUrl',function (req,res,next) {
+        var params = url.parse(req.url,true);
+        var keywords = params.query.searchKey;
+        var area = params.query.area;
+        var limit = Number(params.query.limit);
+        var currentPage = Number(params.query.currentPage);
+        var startNum = (currentPage - 1)*limit ;
+
+        articleFunc.list(startNum,limit,function (docs) {
+            var pageInfo = {
+                "totalItems" : docs.length,
+                "currentPage" : currentPage,
+                "limit" : limit,
+                "startNum" : startNum,
+            };
+            return res.json({
+                docs : docs,
+                pageInfo : pageInfo
+            });
+        });
+    });
 
     //文档添加页面(默认)
-    router.get('/manage/article/add/:key', function(req, res, next) {
+    router.get('/manage/user/add/:key', function(req, res, next) {
         var articleType = req.params.key;
         var targetPath;
 
@@ -430,13 +567,13 @@ router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
         }else{
             targetPath = 'manage/addContent';
         }
-        res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
+        res.render(targetPath, adminFunc.setPageInfo(req,res,settings.REGUSERSLIST));
     });
 
     //文档添加页面(默认)
-    router.post('/manage/article/save/', function(req, res, next) {
-        var article = req.body;
-        articleFunc.save(article,function(err){
+    router.post('/manage/user/save/', function(req, res, next) {
+        var user = req.body;
+        articleFunc.save(user,function(err){
             if(err){
                 res.end(err);
             }else{
@@ -447,8 +584,8 @@ router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
 
 //------------------------------------------文档分类管理开始
     //文档类别列表页面
-    router.get('/manage/articleCategorys', function(req, res, next) {
-        adminFunc.renderToManagePage(req, res,'manage/articleCategorys',settings.CONTENTCATEGORYS);
+    router.get('/manage/articleCategory', function(req, res, next) {
+        adminFunc.renderToManagePage(req, res,'manage/articleCategory',settings.CONTENTCATEGORYS);
     });
 
     //文档添加类别
@@ -478,7 +615,7 @@ router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
     });
 
     //文章类别列表
-    router.get('/manage/articleCategorys/list', function(req, res, next) {
+    router.get('/manage/articleCategory/list?:defaultUrl', function(req, res, next) {
         articleFunc.listCate(function(cates){
             if(cates){
                 res.json(cates);
@@ -491,14 +628,12 @@ router.get('/manage/systemLog/list?:defaultUrl', function(req, res, next) {
 //------------------------------------------文档标签开始
 
 //文档标签管理（list）
-router.get('/manage/articleTags', function(req, res, next) {
-
-    adminFunc.renderToManagePage(req, res,'manage/articleTags',settings.CONTENTTAGS);
-
+router.get('/manage/articleTag', function(req, res, next) {
+    adminFunc.renderToManagePage(req, res,'manage/articleTag',settings.CONTENTTAGS);
 });
 
 //所有标签列表
-router.get('/manage/articleTags/list', function(req, res, next) {
+router.get('/manage/articleTag/list', function(req, res, next) {
     if(adminFunc.checkAdminPower(req,settings.CONTENTTAGS[0] + '_view')){
         Util.findAll(ContentTags,req, res,"request ContentTags List")
     }else{
@@ -511,14 +646,186 @@ router.get('/manage/articleTags/list', function(req, res, next) {
 
 //------------------------------------------文档模板开始
 
-//文档模板管理（list）
 
-    //模板配置
-    router.get('/manage/articleTemps/m/config', function(req, res, next) {
 
-        adminFunc.renderToManagePage(req, res,'manage/articleTemps',settings.CONTENTTEMPSCONFIG);
+    //--------------------消息管理开始---------------------------
+    //管理员公告列表页面
+    router.get('/manage/noticeManage/m/adminNotice', function(req, res, next) {
+        req.query.area = 'announce';
+        adminFunc.renderToManagePage(req, res,'manage/adminNotice',settings.SYSTEMNOTICE);
+    });
+
+    router.get('/manage/notice/list?:defaultUrl',function (req,res,next) {
+        var params = url.parse(req.url,true);
+        var keywords = params.query.searchKey;
+        var area = params.query.area;
+        var limit = Number(params.query.limit);
+        var currentPage = Number(params.query.currentPage);
+        var startNum = (currentPage - 1)*limit ;
+
+        noticeFunc.list(startNum,limit,function (docs) {
+            var pageInfo = {
+                "totalItems" : docs.length,
+                "currentPage" : currentPage,
+                "limit" : limit,
+                "startNum" : startNum,
+            };
+            return res.json({
+                docs : docs,
+                pageInfo : pageInfo
+            });
+        });
+    });
+
+
+    //管理员公告编辑页面
+    router.get('/manage/adminNotice/edit/:noticeId', function(req, res, next) {
+
+        res.render('manage/addNotice', adminFunc.setPageInfo(req,res,settings.SYSTEMNOTICE));
 
     });
+
+    //管理员公告新增页面
+    router.get('/manage/adminNotice/add', function(req, res, next) {
+
+        res.render('manage/addNotice', adminFunc.setPageInfo(req,res,settings.SYSTEMNOTICE));
+
+    });
+
+    //用户消息管理列表
+    router.get('/noticeManage/m/userNotice', function(req, res, next) {
+
+        adminFunc.renderToManagePage(req, res,'manage/userNotice',settings.USERNOTICE);
+
+    });
+
+
+    function addOneNotice(req,res){
+        req.body.type = '1';
+        req.body.adminSender = new AdminUser({_id : req.session.adminUserInfo._id});
+        var notify = new Notify(req.body);
+        notify.save(function(err){
+            if(err){
+                res.end(err);
+            }else{
+                User.find({},'_id',function (err,users) {
+                    if(err){
+                        res.end(err);
+                    }else{
+                        if(users.length > 0){
+                            for(var i=0;i<users.length;i++){
+                                var userNotify = new UserNotify();
+                                userNotify.user = users[i]._id;
+                                userNotify.notify = notify;
+                                userNotify.save(function(err){
+                                    if(err){
+                                        res.end(err);
+                                    }
+                                });
+                            }
+                        }
+                        res.end('success');
+                    }
+                });
+            }
+        });
+    }
+
+    //系统消息列表
+    router.get('/manage/noticeManage/m/systemNotice', function(req, res, next) {
+        req.query.area = 'systemNotice';
+        adminFunc.renderToManagePage(req, res,'manage/systemNotice',settings.SYSTEMBACKSTAGENOTICE);
+
+    });
+
+    //设置为已读消息
+    router.get('/userNotify/setHasRead',function(req,res){
+        var params = url.parse(req.url,true);
+        var currentId = params.query.msgId;
+
+        if(adminFunc.checkAdminPower(req,settings.SYSTEMBACKSTAGENOTICE[0] + '_modify')){
+            if(currentId){
+                UserNotify.setHasRead(currentId,function(err){
+                    if(err){
+                        res.end(err);
+                    }else{
+                        adminFunc.getAdminNotices(req,res,function(noticeObj){
+                            req.session.adminNotices = noticeObj;
+                            res.end('success');
+                        });
+
+                    }
+                });
+            }else{
+                res.end(settings.system_illegal_param);
+            }
+        }else{
+            res.end('对不起，您无权执行该操作！');
+        }
+
+    });
+
+//--------------------消息管理结束--------------------------
+
+
+//--------------------用户管理-----------------------------
+
+    //文档列表页面
+    router.get('/manage/user', function(req, res, next) {
+        adminFunc.renderToManagePage(req, res,'manage/user',settings.CONTENTLIST);
+    });
+
+    //文档列表
+    router.get('/manage/user/list?:defaultUrl',function (req,res,next) {
+        var params = url.parse(req.url,true);
+        var keywords = params.query.searchKey;
+        var area = params.query.area;
+        var limit = Number(params.query.limit);
+        var currentPage = Number(params.query.currentPage);
+        var startNum = (currentPage - 1)*limit ;
+
+        articleFunc.list(startNum,limit,function (docs) {
+            var pageInfo = {
+                "totalItems" : docs.length,
+                "currentPage" : currentPage,
+                "limit" : limit,
+                "startNum" : startNum,
+            };
+            return res.json({
+                docs : docs,
+                pageInfo : pageInfo
+            });
+        });
+    });
+
+    //文档添加页面(默认)
+    router.get('/manage/user/add/:key', function(req, res, next) {
+        var articleType = req.params.key;
+        var targetPath;
+
+        if(articleType == "plug"){
+            targetPath = 'manage/addPlugs';
+        }else{
+            targetPath = 'manage/addContent';
+        }
+        res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
+    });
+
+    //文档添加页面(默认)
+    router.post('/manage/user/save/', function(req, res, next) {
+        var user = req.body;
+        articleFunc.save(user,function(err){
+            if(err){
+                res.end(err);
+            }else{
+                res.end("success");
+            }
+        });
+    });
+
+
+//--------------------用户管理结束-------------------------
+
 
 //--------------------系统管理首页开始---------------------------
 //获取系统首页数据集合
@@ -528,7 +835,5 @@ router.get('/manage/getMainInfo', function(req, res, next) {
 
 return router;
 };
-
-
 
 module.exports = returnAdminRouter;

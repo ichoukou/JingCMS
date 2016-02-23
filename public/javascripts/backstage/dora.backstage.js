@@ -587,7 +587,7 @@ function getTreeParams($scope,type){
             currentCate = $scope.formData.group._id;
         }
         treeObjId = 'adminGroupTree';
-        url = "/admin/manage/adminGroupList/list";
+        url = "/admin/manage/adminGroup/list";
         listId = 'groupName';
     }else if(type == 'contentCategories'){
         if($scope.formData){
@@ -758,7 +758,7 @@ function initPowerList($scope){
 
 //文档类别管理
 function getCategoryData($scope,$http){
-    $http.get("/admin/manage/contentCategorys/list").success(function(result){
+    $http.get("/admin/manage/articleCategory/list").success(function(result){
 
         var arrTree = changeToTreeJson(result);
         //  ztree 相关参数设置

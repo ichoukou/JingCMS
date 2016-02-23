@@ -1,7 +1,7 @@
 var orm = require('orm');
 
 module.exports =  {
-    listSystemLog: function (startNum,limit,cb) {
+    list: function (startNum,limit,cb) {
         global.db.models.admingroup.find({}).limit(limit).offset(startNum).run(function (err, docs) {
         	if(err)
         		console.log(err);

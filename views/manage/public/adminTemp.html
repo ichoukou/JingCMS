@@ -168,8 +168,8 @@
                     <a href="#"><span>文档管理</span> <i class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
                         <li cid="contentManage_content"><a href="/admin/manage/article"><i class="fa fa-file-text-o"></i> 文档管理</a></li>
-                        <li cid="contentManage_cateGory"><a href="/admin/manage/articleCategorys"><i class="fa fa-clipboard"></i> 文档类别管理</a></li>
-                        <li cid="contentManage_tag"><a href="/admin/manage/articleTags"><i class="fa fa-tags"></i> 文档标签管理</a></li>
+                        <li cid="contentManage_cateGory"><a href="/admin/manage/articleCategory"><i class="fa fa-clipboard"></i> 文档类别管理</a></li>
+                        <li cid="contentManage_tag"><a href="/admin/manage/articleTag"><i class="fa fa-tags"></i> 文档标签管理</a></li>
                         <li cid="contentManage_temp">
                             <a href="#"><i class="fa fa-dashboard"></i> 模板管理<i class="fa fa-angle-left pull-right"></i></a>
                             <ul class="treeview-menu">
@@ -179,7 +179,7 @@
                                 <li cid="contentManage_temp_2"><a href="/admin/manage/articleTemps/m/edit"><i class="fa fa-edit"></i> 模板编辑</a></li>
                             </ul>
                         </li>
-                        <li cid="contentManage_msg"><a href="/admin/manage/articleMsgs"><i class="fa fa-comments"></i> 留言管理</a></li>
+                        <li cid="contentManage_msg"><a href="/admin/manage/articleComment"><i class="fa fa-comments"></i> 留言管理</a></li>
                         <li cid="contentManage_notice">
                             <a href="#"><i class="fa fa-bullhorn"></i> 消息管理<i class="fa fa-angle-left pull-right"></i></a>
                             <ul class="treeview-menu">
@@ -197,7 +197,7 @@
                 <li class="treeview" cid="userManage">
                     <a href="#"><span>会员管理</span> <i class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li cid="userManage_user"><a href="/admin/manage/regUsersList"><i class="fa fa-users"></i> 注册会员列表</a></li>
+                        <li cid="userManage_user"><a href="/admin/manage/user"><i class="fa fa-users"></i> 注册会员列表</a></li>
                     </ul>
                 </li>
             </ul><!-- /.sidebar-menu -->
@@ -258,6 +258,7 @@
 <script>
     $(function(){
         var curerntCate = $("#currentCate").val();
+        console.log(curerntCate);
         var sv = $('li[cid="'+curerntCate+'"]');
         $('.treeview-menu').removeClass('open-menu');
         $(".sidebar-menu").find("li").removeClass('active');
