@@ -976,7 +976,9 @@ jingApp.controller("user",['$scope','$http','pageData','getItemService',function
         var editId = obj.data('whatever');
         // 如果不为空则为编辑状态
         if(editId){
-            getItemService.itemInfo(pageData.bigCategory,editId).success(function(result){
+            //getItemService.itemInfo(pageData.bigCategory,editId).success(function(result){
+            $http.get($scope.url+'get/'+editId).success(function(result){
+                console.log(result);
                 $scope.formData = result;
                 $scope.targetID = editId;
             })
@@ -990,7 +992,7 @@ jingApp.controller("user",['$scope','$http','pageData','getItemService',function
 
     // 添加新用户或修改用户
     $scope.processForm = function(isValid){
-        angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
+        angularHttpPost($http,isValid,$scope.url+"save/",$scope.formData,function(data){
             initPagination($scope,$http);
         });
     };

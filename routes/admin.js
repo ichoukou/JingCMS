@@ -9,6 +9,7 @@ var adminGroupFunc = require('../service/adminGroupFunc');
 var articleFunc = require('../service/articleFunc');
 var systemLogFunc = require('../service/systemLogFunc');
 var noticeFunc = require('../service/noticeFunc');
+var userFunc = require('../service/userFunc');
 
 //文件操作
 var PW = require('png-word');
@@ -527,61 +528,6 @@ router.get('/manage/article/list?:defaultUrl', function(req, res, next) {
 
 
 
-
-//------------------------------------------文档管理面开始
-    //文档列表页面
-    router.get('/manage/user', function(req, res, next) {
-        adminFunc.renderToManagePage(req, res,'manage/user',settings.REGUSERSLIST);
-    });
-
-    //文档列表
-    router.get('/manage/user/list?:defaultUrl',function (req,res,next) {
-        var params = url.parse(req.url,true);
-        var keywords = params.query.searchKey;
-        var area = params.query.area;
-        var limit = Number(params.query.limit);
-        var currentPage = Number(params.query.currentPage);
-        var startNum = (currentPage - 1)*limit ;
-
-        articleFunc.list(startNum,limit,function (docs) {
-            var pageInfo = {
-                "totalItems" : docs.length,
-                "currentPage" : currentPage,
-                "limit" : limit,
-                "startNum" : startNum,
-            };
-            return res.json({
-                docs : docs,
-                pageInfo : pageInfo
-            });
-        });
-    });
-
-    //文档添加页面(默认)
-    router.get('/manage/user/add/:key', function(req, res, next) {
-        var articleType = req.params.key;
-        var targetPath;
-
-        if(articleType == "plug"){
-            targetPath = 'manage/addPlugs';
-        }else{
-            targetPath = 'manage/addContent';
-        }
-        res.render(targetPath, adminFunc.setPageInfo(req,res,settings.REGUSERSLIST));
-    });
-
-    //文档添加页面(默认)
-    router.post('/manage/user/save/', function(req, res, next) {
-        var user = req.body;
-        articleFunc.save(user,function(err){
-            if(err){
-                res.end(err);
-            }else{
-                res.end("success");
-            }
-        });
-    });
-
 //------------------------------------------文档分类管理开始
     //文档类别列表页面
     router.get('/manage/articleCategory', function(req, res, next) {
@@ -784,7 +730,7 @@ router.get('/manage/articleTag/list', function(req, res, next) {
         var currentPage = Number(params.query.currentPage);
         var startNum = (currentPage - 1)*limit ;
 
-        articleFunc.list(startNum,limit,function (docs) {
+        userFunc.list(startNum,limit,function (docs) {
             var pageInfo = {
                 "totalItems" : docs.length,
                 "currentPage" : currentPage,
@@ -798,25 +744,31 @@ router.get('/manage/articleTag/list', function(req, res, next) {
         });
     });
 
-    //文档添加页面(默认)
-    router.get('/manage/user/add/:key', function(req, res, next) {
-        var articleType = req.params.key;
-        var targetPath;
-
-        if(articleType == "plug"){
-            targetPath = 'manage/addPlugs';
+    router.get("/manage/user/get/:key",function (req,res,next) {
+        var targetId = parseInt(req.params.key);
+        if(targetId>=0){
+            userFunc.get(targetId,function (err,data) {
+                if(err){
+                    console.log(err);
+                    res.end(err);
+                }else{
+                    console.log(data);
+                    return res.json(data);
+                }
+            });
         }else{
-            targetPath = 'manage/addContent';
+            res.end(settings.system_illegal_param);
         }
-        res.render(targetPath, adminFunc.setPageInfo(req,res,settings.CONTENTLIST));
     });
+
 
     //文档添加页面(默认)
     router.post('/manage/user/save/', function(req, res, next) {
         var user = req.body;
-        articleFunc.save(user,function(err){
+        userFunc.save(user,function(err){
+            console.log(err);
             if(err){
-                res.end(err);
+                res.end("error");
             }else{
                 res.end("success");
             }
