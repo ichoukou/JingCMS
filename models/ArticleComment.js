@@ -2,7 +2,7 @@
  * 留言管理
  */
 module.exports = function (db, cb) {
-    db.define('articlecomment', {
+    db.define('article_comment', {
         articleTitle : String, // 留言对应的内容标题
         utype : {type : "text" ,default : '0'}, // 评论者类型 0,普通用户，1,管理员
         relationMsgId : String, // 关联的留言Id

@@ -2,90 +2,94 @@ var orm = require("orm")
 var settings = require("./settings");
 
 module.exports = function (){
+    orm.settings.set('connection.debug',true);
     return orm.connect(settings.MYSQL_URL, function(err, db) {
-        if (err) return console.error('Connection error: ' + err);
+        if (err) 
+            return console.error('Connection error: ' + err);
 
-        //管理员
-        db.load('./AdminUser',function (err) {
-            console.log(err);
-        });
-        //管理组
-        db.load('./AdminGroup',function (err) {
-            db.models.admingroup.sync(function(){});
-        });
+        var models={
+            AdminUser:"admin_user", //管理员
+            AdminGroup:"admin_group", //管理组
+            User:"user", //系统用户
+            Article:"article", //文章
+            ArticleCategory:"article_category", //分类
+            ArticleComment:"article_comment", //评论
+            ArticleTag:"article_tag", //评论
+            Ad:"ad", //广告
+            SystemLog:"system_log", //系统日志
+            Notice:"notice", //系统消息
+        };
 
-        db.load('./User',function (err) {
-            console.log(err);
-        });
-        db.load('./Article',function (err) {
-            console.log(err);
-        });
-        db.load('./ArticleCategory',function (err) {
-            console.log(err);
-        });
+        var model_dir="./"
 
-        db.load('./ArticleComment',function (err) {
-            console.log(err);
-        });
+        //--------------------加载模型---------------------------
+        console.log("加载模型");
+        for (var file in models){
+            db.load(model_dir+file,function (err) {
+                if(err) console.log(err);
+                db.models[models[file]].sync(function () {});
+            });
+        }
 
-        //系统操作日志
-        db.load('./SystemLog',function (err) {
-            if(err)
-                console.log(err);
-            db.models.systemlog.sync(function () {});
-        });
+        //--------------------定义模型关系-------------------------
+        //评论与用户关系
+        db.models.article_comment.hasOne("author", db.models.user);
+        db.models.article_comment.hasOne("article", db.models.article);
+        db.models.article_comment.hasOne("replayauthor", db.models.user);
+        db.models.article_comment.hasOne("adminauthor", db.models.admin_user);
+        db.models.article_comment.sync(function () {});
 
-        //系统提醒
-        db.load('./Notice',function (err) {
-            if(err)
-                console.log(err);
-            db.models.notice.sync(function () {});
-        });
-
-
-        //用户评论关系
-        db.models.articlecomment.hasOne("author", db.models.user);
-        db.models.articlecomment.hasOne("article", db.models.article);
-        db.models.articlecomment.hasOne("replayauthor", db.models.user);
-        db.models.articlecomment.hasOne("adminauthor", db.models.adminuser);
-        db.models.articlecomment.sync(function () {});
+        //文章与用户关系
+        db.models.article.hasOne('author', db.models.user);
+        db.models.user.sync(function () {});
+        db.models.article.sync(function () {});
 
 
-        var User    = db.models.user;
-        var Article = db.models.article;
+        //--------------------定义常用方法---------------------------
+        /**
+        *根据column值进行检索
+        */
+        db.search=function (table,column,value,startNum,limit,cb) {
+            var condition = {};
+            condition[column]=orm.like("%"+value+"%");
+            db.models[table].find(condition).limit(limit).offset(startNum).run(function (err, docs) {
+                if(err)
+                    console.log(err);
+                cb(docs);
+            });
+        };
+        //db.search('user','name','t',0,100,function(docs){});
 
-        //define relationships
-        Article.hasOne('author', User);
+        db.get=function (table,id,cb) {
+           db.models[table].get(id,cb);
+        };
 
-        User.sync(function () {});
+        db.list=function (table,startNum,limit,cb) {
+            db.models[table].find({}).limit(limit).offset(startNum).run(function (err, docs) {
+                if(err)
+                    console.log(err);
+                cb(docs);
+            });
+        };
 
-        Article.sync(function () {
-        });
+        db.del=function (table,ids,cb) {
+            db.models[table].find({id:ids}).remove(cb);
+        };
 
-        db.models.adminuser.sync(function () {
-        });
-        db.models.article_category.sync(function () {
-        });
-
-        // var User = db.models.adminuser;
-        // User.find({ name: "test" }, function (err, people) {
-        //             if (err) throw err;
-        //             console.log("People found: %d", people.length);
-        //             console.log("First person: %s, age %d", people[0].name, people[0].password);
-        //         });
-
-        // User.sync(function () {
-        //      // created tables for Person model
-        // });
-
-        // User.create({name: "test", password: "test" }, function(err) {
-        //         if (err) throw err;
-        //         User.find({ name: "test" }, function (err, people) {
-        //             if (err) throw err;
-        //             console.log("People found: %d", people.length);
-        //             console.log("First person: %s, password %s", people[0].name, people[0].password);
-        //         });
-        //     });
+        db.save=function (table,content,cb) {
+            if(content['id']!="undefined"){
+                db.models[table].get(content['id'],function (err,ag) {
+                    for(var p in content)
+                        ag[p]=content[p];
+                    ag.save(function (err) {
+                        cb(err);
+                    });
+                });
+            }
+            else{
+                db.models[table].create(content,cb);
+            }
+        };
         
         // db.drop(function () {
         //     User.create({name: "test", password: "test" }, function(err) {
@@ -98,6 +102,5 @@ module.exports = function (){
         //     });
         // });
     });
-
 }
 

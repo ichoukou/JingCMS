@@ -197,7 +197,7 @@
                 <li class="treeview" cid="userManage">
                     <a href="#"><span>会员管理</span> <i class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li cid="userManage_user"><a href="/admin/manage/user"><i class="fa fa-users"></i> 注册会员列表</a></li>
+                        <li cid="manage_user"><a href="/admin/manage/user"><i class="fa fa-users"></i> 注册会员列表</a></li>
                     </ul>
                 </li>
             </ul><!-- /.sidebar-menu -->
@@ -257,9 +257,8 @@
 
 <script>
     $(function(){
-        var curerntCate = $("#currentCate").val();
-        console.log(curerntCate);
-        var sv = $('li[cid="'+curerntCate+'"]');
+        var currentCate = $("#currentCate").val();
+        var sv = $('li[cid="'+currentCate+'"]');
         $('.treeview-menu').removeClass('open-menu');
         $(".sidebar-menu").find("li").removeClass('active');
         sv.parents('li').addClass('active');

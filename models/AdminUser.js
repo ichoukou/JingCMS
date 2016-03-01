@@ -1,5 +1,5 @@
 module.exports = function (db, cb) {
-    db.define('adminuser', {
+    db.define('admin_user', {
         name : String,
         password: String,
         logo: { type: "text", default: "/upload/images/defaultlogo.png" },

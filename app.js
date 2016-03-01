@@ -14,7 +14,17 @@ global.db = db;
 
 //all routes
 var routes = require('./routes/index');
-var users = require('./routes/users');
+var user = require('./routes/user');
+var article = require('./routes/article');
+var articleCategory = require('./routes/articleCategory');
+var articleComment = require('./routes/articleComment');
+var articleTag = require('./routes/articleTag');
+
+var systemLog = require('./routes/systemLog');
+
+var adminuser = require('./routes/adminuser');
+var admingroup = require('./routes/admingroup');
+
 var io = require('socket.io')();
 var admin = require('./routes/admin')(io);
 
@@ -77,12 +87,27 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
 app.use('/login',routes); // 即为为路径 /login 设置路由
 app.use('/register',routes); // 即为为路径 /register 设置路由
 app.use('/home',routes); // 即为为路径 /home 设置路由
 app.use("/logout",routes); // 即为为路径 /logout 设置路由
 app.use('/admin', admin);
+
+//前台用户管理
+app.use('/admin/manage/user', user);
+
+//文章管理
+app.use('/admin/manage/article', article);
+app.use('/admin/manage/articleCategory', articleCategory);
+app.use('/admin/manage/articleComment', articleComment);
+app.use('/admin/manage/articleTag', articleTag);
+
+//后台用户管理
+app.use('/admin/manage/adminUser', adminuser);
+app.use('/admin/manage/adminGroup', admingroup);
+
+//系统日志管理
+app.use('/admin/manage/systemLog',systemLog);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
