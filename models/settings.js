@@ -14,11 +14,12 @@ module.exports = {
     encrypt_key : 'dora',
     // 数据库配置
     URL: 'mongodb://168.7.1.61:27017/doracms',
-    DB: 'doracms',
     HOST: '',
     PORT: 27017,
-    USERNAME: '',
-    PASSWORD: '',
+
+    USERNAME: 'root',
+    PASSWORD: 'root',
+    DB: 'express',
 
     // Mysql配置
     MYSQL_URL:'mysql://root:root@localhost/express',
@@ -85,8 +86,9 @@ module.exports = {
     email_notice_user_reg : 'notice_user_reg',
 
 
+    BACKUPDIR:process.cwd()+'/public/backup/',
 //    信息提示相关
-    system_illegal_param : '非法参数'
+    system_illegal_param : '非法参数',
 };
 
 

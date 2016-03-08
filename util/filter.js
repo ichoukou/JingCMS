@@ -3,8 +3,8 @@
  */
 var mongoose = require('mongoose');
 var UserModel = mongoose.model('User');
-var settings = require('../models/db/settings');
-var siteFunc = require('../models/db/siteFunc');
+var settings = require('../models/settings');
+var siteFunc = require('../models/siteFunc');
 var UserNotify = require('../models/UserNotify');
 //用户实体类
 var User = require("../models/User");

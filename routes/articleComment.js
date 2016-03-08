@@ -5,7 +5,6 @@ var url = require('url');
 //系统配置
 var settings = require("../models/settings");
 var adminFunc = require('../service/adminFunc');
-var articleFunc = require('../service/articleFunc');
 
 router.get('/', function(req, res, next) {
     adminFunc.renderToManagePage(req, res,'manage/articleComment',settings.MESSAGEMANAGE);

@@ -34,3 +34,11 @@ node_modules
 # Optional REPL history
 .node_repl_history
 
+#测试目录
+test/
+
+#主题目录
+public/themes/
+
+#模板目录
+views/web/temp/

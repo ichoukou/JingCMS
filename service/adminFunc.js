@@ -30,13 +30,13 @@ var adminFunc = {
                  global.db.models.article.count(function (err,articleCount) {
                      global.db.models.articlecomment.count(function (err,commentCount) {
                          global.db.models.user.find({},["name", "Z"],function (err,users) {
-                                    return res.json({
-                                        adminUserCount : adminCount,
-                                        regUsersCount : userCount,
-                                        contentsCount : articleCount,
-                                        msgCount : commentCount,
-                                        regUsers : users,
-                                    });
+                                return res.json({
+                                    adminUserCount : adminCount,
+                                    regUsersCount : userCount,
+                                    contentsCount : articleCount,
+                                    msgCount : commentCount,
+                                    regUsers : users,
+                                });
                         });
                     });
                 });

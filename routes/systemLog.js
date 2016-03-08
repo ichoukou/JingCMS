@@ -5,7 +5,6 @@ var url = require('url');
 //系统配置
 var settings = require("../models/settings");
 var adminFunc = require('../service/adminFunc');
-var systemLogFunc = require('../service/systemLogFunc');
 
 //-------------------------系统日志管理开始-----------------
 router.get('/', function(req, res, next) {

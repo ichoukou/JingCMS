@@ -38,6 +38,38 @@ router.get('/list?:defaultUrl', function(req, res, next) {
     }
 });
 
+router.post("/save",function (req,res,next) {
+    //TODO check power
+    var content = req.body;
+
+    global.db.save("article_tag",content,function (err) {
+        if(err){
+            res.end(err);
+        }else{
+            res.end("success");
+        }
+    });     
+});
+
+router.get('/del?:defaultUrl', function(req, res, next) {
+    var params = url.parse(req.url,true);
+    var ids = [];
+    var id = params.query.id;
+    if(id){
+        var ss = id.split(',');
+        for(var i in ss){
+            ids.push(ss[i]);
+        }
+    }
+    global.db.del('article_tag',ids,function (err) {
+        if(err){
+            res.end(err);
+        }else{
+            res.end("success");
+        }
+    });
+});
+
 //--------------------文章管理结束-----------------------------
 
 module.exports = router;

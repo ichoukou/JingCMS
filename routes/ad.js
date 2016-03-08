@@ -7,9 +7,21 @@ var settings = require("../models/settings");
 var adminFunc = require('../service/adminFunc');
 
 //----------------文章管理开始-------------------
+//广告管理列表页面
 router.get('/', function(req, res, next) {
-    adminFunc.renderToManagePage(req, res,'manage/article',settings.CONTENTLIST);
+    adminFunc.renderToManagePage(req, res,'manage/ad',settings.ADSLIST);
 });
+
+//广告添加页面
+router.get('/add', function(req, res, next) {
+    adminFunc.renderToManagePage(req, res,'manage/editAd',settings.ADSLIST);
+});
+
+//广告编辑页面
+router.get('/edit/:content', function(req, res, next) {
+    adminFunc.renderToManagePage(req, res,'manage/editAd',settings.ADSLIST);
+});
+
 
 router.get('/del?:defaultUrl', function(req, res, next) {
     var params = url.parse(req.url,true);
@@ -21,7 +33,7 @@ router.get('/del?:defaultUrl', function(req, res, next) {
             ids.push(ss[i]);
         }
     }
-    global.db.del("article",ids,function (err) {
+    global.db.del("ad",ids,function (err) {
         if(err){
             res.end(err);
         }else{
@@ -40,7 +52,7 @@ router.get('/list?:defaultUrl', function(req, res, next) {
         var currentPage = Number(params.query.currentPage);
         var startNum = (currentPage - 1)*limit ;
 
-        global.db.list("article",startNum,limit,function (docs) {
+        global.db.list("ad",startNum,limit,function (docs) {
             var pageInfo = {
                 "totalItems" : docs.length,
                 "currentPage" : currentPage,

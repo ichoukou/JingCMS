@@ -15,12 +15,17 @@ global.db = db;
 //all routes
 var routes = require('./routes/index');
 var user = require('./routes/user');
-var article = require('./routes/article');
-var articleCategory = require('./routes/articleCategory');
-var articleComment = require('./routes/articleComment');
-var articleTag = require('./routes/articleTag');
+var article = require('./routes/admin/article');
+var articleCategory = require('./routes/admin/articleCategory');
+var articleComment = require('./routes/admin/articleComment');
+var articleTag = require('./routes/admin/articleTag');
+var articleTemplate = require('./routes/admin/articleTemplate');
 
-var systemLog = require('./routes/systemLog');
+var systemLog = require('./routes/admin/systemLog');
+
+var ad = require('./routes/ad');
+var file = require('./routes/file');
+var backup = require('./routes/backup');
 
 var adminuser = require('./routes/adminuser');
 var admingroup = require('./routes/admingroup');
@@ -101,6 +106,8 @@ app.use('/admin/manage/article', article);
 app.use('/admin/manage/articleCategory', articleCategory);
 app.use('/admin/manage/articleComment', articleComment);
 app.use('/admin/manage/articleTag', articleTag);
+app.use('/admin/manage/articleTemplate',articleTemplate);
+
 
 //后台用户管理
 app.use('/admin/manage/adminUser', adminuser);
@@ -108,6 +115,15 @@ app.use('/admin/manage/adminGroup', admingroup);
 
 //系统日志管理
 app.use('/admin/manage/systemLog',systemLog);
+
+//广告管理
+app.use('/admin/manage/ad',ad);
+
+//文件管理
+app.use('/admin/manage/file',file);
+
+//备份管理
+app.use('/admin/manage/backup',backup);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

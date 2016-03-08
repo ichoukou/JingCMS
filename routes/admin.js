@@ -4,11 +4,6 @@ var url = require('url');
 
 var Util = require('../util/Util');
 var adminFunc = require('../service/adminFunc');
-var adminGroupFunc = require('../service/adminGroupFunc');
-var articleFunc = require('../service/articleFunc');
-var systemLogFunc = require('../service/systemLogFunc');
-var noticeFunc = require('../service/noticeFunc');
-var userFunc = require('../service/userFunc');
 
 //文件操作
 var PW = require('png-word');
@@ -142,25 +137,6 @@ router.get('/manage/filesList', function(req, res, next) {
 
 //------------------------------------------文件管理器结束
 
-
-//------------------------------------------数据管理开始
-
-router.get('/manage/dataManage/m/backUpData', function(req, res, next) {
-
-    adminFunc.renderToManagePage(req, res,'manage/backUpData',settings.BACKUPDATA);
-
-});
-
-
-//备份数据库执行
-router.get('/manage/backupDataManage/backUp', function(req, res, next) {
-    if(adminFunc.checkAdminPower(req,settings.BACKUPDATA[0] + '_backup')) {
-        system.backUpData(res, req);
-    }else{
-        res.end('对不起，您无权执行该操作！');
-    }
-});
-//------------------------------------------数据管理结束
 
 
 //------------------------------------------系统日志管理结束

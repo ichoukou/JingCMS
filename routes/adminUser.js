@@ -6,7 +6,6 @@ var url = require('url');
 var settings = require("../models/settings");
 
 var adminFunc = require('../service/adminFunc');
-var adminUserFunc = require('../service/adminUserFunc');
 
 //系统用户管理（list）
 router.get('/', function(req, res, next) {

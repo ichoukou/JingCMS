@@ -184,8 +184,10 @@ jingApp.controller("adminGroup",['$scope','$http','pageData','getItemService',fu
 
 
 //广告列表
-jingApp.controller("adsList",['$scope','$http',function($scope,$http){
+jingApp.controller("ad",['$scope','$http',function($scope,$http){
     $scope.formData = {};
+    $scope.url="/admin/manage/ad/";
+ 
     //获取邮件模板列表信息
     initPagination($scope,$http);
     // 删除广告
@@ -195,7 +197,7 @@ jingApp.controller("adsList",['$scope','$http',function($scope,$http){
 
 
 //广告编辑/添加
-jingApp.controller("addAds",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
+jingApp.controller("editAd",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
     $scope.formData = {};
     $scope.formData.type = "0";
     $scope.formData.content = {};
@@ -232,7 +234,7 @@ jingApp.controller("addAds",['$scope','$http','pageData','getItemService',functi
 
     $scope.targetID = window.location.href.split("/")[7];
     if($scope.targetID){
-        getItemService.itemInfo(pageData.bigCategory,$scope.targetID).success(function(result){
+        $http.get($scope.url+'get/'+$scope.targetID).success(function(result){
             $scope.formData = result;
 
             if(result.type === "0"){ //文字广告
@@ -293,7 +295,7 @@ jingApp.controller("addAds",['$scope','$http','pageData','getItemService',functi
         };
 
         angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),groupData,function(data){
-            window.location = "/admin/manage/adsList";
+            window.location = "/admin/manage/ad";
         });
 
     }
@@ -305,6 +307,7 @@ jingApp.controller("filesList",['$scope','$http',function($scope,$http){
     $scope.formData = {};
     $scope.mdFormData = {};
     $scope.fileData = {};
+    $scope.url="/admin/manage/file/";
 
     // 初始化显示方式
     $scope.listView = true;
@@ -313,7 +316,7 @@ jingApp.controller("filesList",['$scope','$http',function($scope,$http){
     // 监听确认删除弹窗，传递参数
     $scope.delFilesItem = function(filePath){
         initCheckIfDo($scope,'','您确认要删除该文件吗？',function(path){
-            angularHttpGet($http,"/admin/manage/filesList/fileDel?filePath="+filePath,function(){
+            angularHttpGet($http,$scope.url+"del?filePath="+filePath,function(){
                 getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
             });
         });
@@ -345,7 +348,7 @@ jingApp.controller("filesList",['$scope','$http',function($scope,$http){
             $scope.mdFormData.name = (editPath.split(","))[0];
             $scope.mdFormData.path = (editPath.split(","))[1];
             $scope.targetID = (editPath.split(","))[1];
-            $http.get("/admin/manage/filesList/getFileInfo?filePath="+$scope.mdFormData.path).success(function(result){
+            $http.get($scope.url+"getFileInfo?filePath="+$scope.mdFormData.path).success(function(result){
                 $scope.mdFormData.code = result.fileData;
             })
         }else{
@@ -358,11 +361,11 @@ jingApp.controller("filesList",['$scope','$http',function($scope,$http){
     });
 
     $scope.processForm = function(isValid){
-        var curentUrl = "/admin/manage/filesList/addFolder";
+        var curentUrl = $scope.url+"addFolder";
         if($scope.targetID)
         {
             $scope.formData.newPath = $scope.rootPath +$scope.currentPath +"/"+ $scope.formData.newName;
-            curentUrl = "/admin/manage/filesList/fileReName";
+            curentUrl = $scope.url+"rename";
         }
         angularHttpPost($http,isValid,curentUrl,$scope.formData,function(data){
             getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
@@ -371,8 +374,7 @@ jingApp.controller("filesList",['$scope','$http',function($scope,$http){
 
     // 提交更新后的文件
     $scope.processMdForm = function(isValid){
-
-        angularHttpPost($http,isValid,'/admin/manage/filesList/updateFileInfo',$scope.mdFormData,function(data){
+        angularHttpPost($http,isValid,$scope.url+'updateFileInfo',$scope.mdFormData,function(data){
             getFolderList($scope,$http,$scope.rootPath +$scope.currentPath);
         });
 
@@ -422,20 +424,36 @@ jingApp.controller("filesList",['$scope','$http',function($scope,$http){
 jingApp.controller("backUpData",['$scope','$http',function($scope,$http){
     //初始化名称和权限
     $scope.formData = {};
+    $scope.url="/admin/manage/backup/";
+
     //获取备份数据列表
     initPagination($scope,$http);
     //删除备份数据
     $scope.delDataItem = function(id,path){
         initCheckIfDo($scope,id,'您确认要删除该条备份数据吗？',function(currentID){
-            angularHttpGet($http,"/admin/manage/backupDataManage/delItem?uid="+currentID+"&filePath="+path,function(){
+            angularHttpGet($http,$scope.url+"del?uid="+currentID+"&filePath="+path,function(){
                 initPagination($scope,$http);
+            });
+        });
+    };
+
+    //恢复数据库
+    $scope.restore = function(id,name){
+        initCheckIfDo($scope,id,'您确认要恢复该备份数据吗？',function(currentID){
+            angularHttpGet($http,$scope.url+"restore?uid="+currentID+"&name="+name,function(){
+                $.tipsShow({
+                    message : '数据恢复成功',
+                    type : 'success' ,
+                    callBack : function(){
+                    }
+                });
             });
         });
     };
 
     $scope.backUpData = function(){
         initCheckIfDo($scope,'','确认执行备份操作？数据库操作请谨慎处理',function(currentID){
-            angularHttpGet($http,"/admin/manage/backupDataManage/backUp",function(){
+            angularHttpGet($http,$scope.url+"backUp",function(){
                 $.tipsShow({
                     message : '数据备份成功',
                     type : 'success' ,
@@ -683,7 +701,6 @@ jingApp.controller('articleCategory',['$scope','$http','pageData','getItemServic
 
     //添加类别
     $scope.processForm = function(isValid){
-
         // angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
         //     getCategoryData($scope,$http);
         // });
@@ -697,6 +714,8 @@ jingApp.controller('articleCategory',['$scope','$http','pageData','getItemServic
 jingApp.controller("articleTag",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
     //初始化名称和权限
     $scope.formData = {};
+    $scope.url = "/admin/manage/articleTag/";
+
     //获取标签列表
     initPagination($scope,$http);
     //删除标签
@@ -710,7 +729,8 @@ jingApp.controller("articleTag",['$scope','$http','pageData','getItemService',fu
         // 如果不为空则为编辑状态
         if(editId){
             modalTitle.text("编辑文章标签");
-            getItemService.itemInfo(pageData.bigCategory,editId).success(function(result){
+            var requestPath = $scope.url+ "get?id="+editId;
+            $http.get(requestPath).success(function(result){
                 $scope.formData = result;
                 $scope.targetID = editId;
             })
@@ -725,7 +745,7 @@ jingApp.controller("articleTag",['$scope','$http','pageData','getItemService',fu
 
     // 添加新标签
     $scope.processForm = function(isValid){
-        angularHttpPost($http,isValid,getTargetPostUrl($scope,pageData.bigCategory),$scope.formData,function(data){
+        angularHttpPost($http,isValid,$scope.url+"save",$scope.formData,function(data){
             initPagination($scope,$http);
         });
     }
@@ -733,16 +753,18 @@ jingApp.controller("articleTag",['$scope','$http','pageData','getItemService',fu
 
 
 //模板列表
-jingApp.controller("contentTemps",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
+jingApp.controller("articleTemplate",['$scope','$http','pageData','getItemService',function($scope,$http,pageData,getItemService){
 
     // 初始化名称和权限
     $scope.formData = {};
+    $scope.url = "/admin/manage/articleTemplate/";
+
     // 获取模板列表
     initPagination($scope,$http);
     // 删除模板单元
     $scope.delTempItem = function(id){
         initCheckIfDo($scope,id,'您确认要删除选中的模板单元吗？',function(currentID){
-            angularHttpGet($http,"/admin/manage/contentManage_tpItem/del?uid="+currentID,function(){
+            angularHttpGet($http,$scope.url+"delTemplateItem?uid="+currentID,function(){
                 initPagination($scope,$http);
             });
         });
@@ -757,7 +779,10 @@ jingApp.controller("contentTemps",['$scope','$http','pageData','getItemService',
         // 如果不为空则为编辑状态
         if(editId){
             modalTitle.text("编辑文章模板");
-            getItemService.itemInfo(pageData.bigCategory,editId).success(function(result){
+
+            var requestPath = $scope.url+ "get?id="+editId;
+            $http.get(requestPath).success(function(result){
+                //getItemService.itemInfo(pageData.bigCategory,editId).success(function(result){
                 $scope.formData = result;
                 $scope.targetID = editId;
                 initTreeDataByType($scope,$http,"tempForderTree")
@@ -775,17 +800,14 @@ jingApp.controller("contentTemps",['$scope','$http','pageData','getItemService',
 
     // 添加新模板单元
     $scope.processForm = function(isValid){
-
-        angularHttpPost($http,isValid,"/admin/manage/templateItem/addNew?defaultTemp="+$scope.formData.defaultTemp,$scope.formData,function(data){
+        angularHttpPost($http,isValid,$scope.url+"addNewTemplateItem?defaultTemp="+$scope.formData.defaultTemp,$scope.formData,function(data){
             initPagination($scope,$http);
         });
-
     };
 
     // 启用模板
     $scope.enableThisTemp = function(tempId,alias){
-
-        $http.get('/admin/manage/enableTemp?tempId='+tempId+'&alias='+alias).success(function(result){
+        $http.get($scope.url+'/enableTemplate?tempId='+tempId+'&alias='+alias).success(function(result){
             showMessage($scope,$http,result,'恭喜，您已成功启用该模板！');
         })
     };
@@ -832,7 +854,7 @@ jingApp.controller("systemTemps",['$scope','$http',function($scope,$http){
             message : $('#sys-progress-bar'),
             mask : true
         });
-        $http.get('/admin/manage/installTemp?tempId='+tempId).success(function(result){
+        $http.get('/admin/manage/articleTemplate/installTemplate?tempId='+tempId).success(function(result){
             setTimeout(function(){
                 $.unblock();
                 showMessage($scope,$http,result,'恭喜，您已成功安装该模板！');
@@ -844,14 +866,15 @@ jingApp.controller("systemTemps",['$scope','$http',function($scope,$http){
 }]);
 
 //模板编辑
-jingApp.controller("contentTempEdit",['$scope','$http',function($scope,$http){
+jingApp.controller("articleTemplateEdit",['$scope','$http',function($scope,$http){
     $scope.formData = {};
+    $scope.url = "/admin/manage/articleTemplate/";
     initTreeDataByType($scope,$http,"allThemeFolderTree");
     initSystemTempData($scope,$http);
 
     // 提交更新后的文件
     $scope.processMdForm = function(isValid){
-        angularHttpPost($http,isValid,'/admin/manage/contentTemps/updateFileInfo',$scope.formData,function(data){
+        angularHttpPost($http,isValid,$scope.url+'updateFileInfo',$scope.formData,function(data){
             $.tipsShow({ message : '更新成功！', type : 'success' });
         });
     };

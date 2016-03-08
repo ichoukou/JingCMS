@@ -2,21 +2,21 @@
  * Created by Administrator on 2015/4/18.
  */
 //邮件发送插件
-var nodemailer  = require("nodemailer");
+//var nodemailer  = require("nodemailer");
 //文件操作对象
 var fs = require('fs');
 var url = require('url');
 var stat = fs.stat;
 //数据库操作对象
-var DbOpt = require("../models/Dbopt");
+//var DbOpt = require("../models/Dbopt");
 //数据操作日志
-var DataOptionLog = require("../models/DataOptionLog");
+//var DataOptionLog = require("../models/DataOptionLog");
 //时间格式化
 var moment = require('moment');
 //站点配置
-var settings = require("../models/db/settings");
-var siteFunc = require("../models/db/siteFunc");
-var adminFunc = require("../models/db/adminFunc");
+var settings = require("../models/settings");
+//var siteFunc = require("../models/db/siteFunc");
+var adminFunc = require("../service/adminFunc");
 //文件压缩
 var fs = require('fs');
 var child = require('child_process');
@@ -27,7 +27,7 @@ var iconv = require('iconv-lite');
 var system = {
 
     sendEmail : function(key,obj,callBack){
-
+/*
         var emailTitle = "Hello";
         var emailSubject = "Hello";
         var emailContent = "Hello";
@@ -36,10 +36,10 @@ var system = {
         if(key == settings.email_findPsd){
             toEmail = obj.email;
             var oldLink = obj.password +'$'+ obj.email +'$'+ settings.session_secret;
-            var newLink = DbOpt.encrypt(oldLink,settings.encrypt_key);
+            //var newLink = DbOpt.encrypt(oldLink,settings.encrypt_key);
 
             emailSubject = emailTitle = '['+settings.SITETITLE +'] 通过激活链接找回密码';
-            emailContent = siteFunc.setConfirmPassWordEmailTemp(obj.userName,newLink);
+            //emailContent = siteFunc.setConfirmPassWordEmailTemp(obj.userName,newLink);
         }else if(key == settings.email_notice_contentMsg){
             emailSubject = emailTitle = '['+settings.SITETITLE +'] 用户留言提醒';
             emailContent = siteFunc.setNoticeToAdminEmailTemp(obj);
@@ -86,7 +86,7 @@ var system = {
                 callBack();
             }
         });
-
+*/
 
     },
     scanFolder : function(path){ //文件夹列表读取
@@ -258,61 +258,6 @@ var system = {
 
             }) ;
         }
-    },
-    backUpData : function(res,req){  // 数据备份
-        var date = new Date();
-        var ms = moment(date).format('YYYYMMDDHHmmss').toString();
-        var dataPath = settings.DATABACKFORDER + ms;
-//        var cmdstr = 'mongodump -o "'+dataPath+'"';
-        var cmdstr = settings.MONGODBEVNPATH + 'mongodump -u '+settings.USERNAME+' -p '+settings.PASSWORD+' -d '+settings.DB+' -o "'+dataPath+'"';
-
-        var batPath = settings.DATAOPERATION + '/backupData.sh';
-        if(!fs.existsSync(settings.DATABACKFORDER)){
-            fs.mkdirSync(settings.DATABACKFORDER);
-        }
-        if (fs.existsSync(dataPath)) {
-
-            console.log('已经创建过备份了');
-
-        } else {
-
-            fs.mkdir(dataPath,0777,function(err1){
-                if (err1) throw err1;
-
-                child.exec(cmdstr,function (error, stdout, stderr) {
-                    if (error !== null) {
-                        console.log('exec error: ' + error);
-                    }else{
-                        console.log('数据备份成功');
-                        //生成压缩文件
-                        var output = fs.createWriteStream(settings.DATABACKFORDER + ms +'.zip');
-                        var archive = archiver('zip');
-
-                        archive.on('error', function(err){
-                            throw err;
-                        });
-
-                        archive.pipe(output);
-                        archive.bulk([
-                            { src: [dataPath+'/**']}
-                        ]);
-                        archive.finalize();
-
-                        // 操作记录入库
-                        var optLog = new DataOptionLog();
-                        optLog.logs = "数据备份";
-                        optLog.path = dataPath;
-                        optLog.fileName = ms +'.zip';
-                        optLog.save(function(err3){
-                            if (err3) throw err3;
-                            res.end("success");
-                        })
-                    }
-                });
-
-            })
-        }
-
     },
     //文件夹复制
     copyForder : function(fromPath,toPath){
