@@ -1,0 +1,12 @@
+<div class="col-md-6 col-sm-6">
+    <div class="header">
+        <a target="_blank" href="http://www.8btc.com/blockchain"><%= cate.title %></a>
+    </div>
+    <div class="article-list">
+        <% item=cate.items.shift() %>
+        <% include ../newarticle.html %>
+        <% cate.items.forEach(function(item){ %>    
+        <% include ../article.html %>
+        <% }) %>    
+    </div>
+</div>

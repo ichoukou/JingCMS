@@ -3,6 +3,123 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
+  var recommend ={
+    title:"币头条",
+    items:[{
+        pic:"/static/js/白硕-380x228.jpeg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"/static/js/白硕-380x228.jpeg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"/static/js/白硕-380x228.jpeg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"/static/js/白硕-380x228.jpeg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        link:"http://www.8btc.com/453535",
+    },
+    ],
+  };
+  var newpost ={
+    title:"每日新闻",
+    items:[{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },
+    ],
+  }
+
+var cate1 ={
+    title:"区块链",
+    items:[{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },{
+        pic:"http://7fvhfe.com1.z0.glb.clouddn.com/%40%2F/wp-content/uploads/2016/04/openbazaar1-380x228.jpg",
+        title:"上交所前首席技术官：现在的区块链概念股是伪概念",
+        content:"近期，区块链技术受到了资本市场的热烈关注。今天，上海证券交易所前首席技术官白硕却明确表示，现在资本市场的区块链概念股其实都是伪概念，并不受业内认同。...",
+        comment:"3",
+        date:"2015-04-17",
+        link:"http://www.8btc.com/453535",
+    },
+    ],
+  }
+    res.locals={
+        description:"hello world!",
+        keywords:"keywords",
+        newpost:newpost,
+        cate1:cate1,
+    }
+
   res.render('index', { title: 'Express' });
 });
 

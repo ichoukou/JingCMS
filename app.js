@@ -9,29 +9,30 @@ var bodyParser = require('body-parser');
 var partials = require('express-partials');
 
 //database
-var db = require('./models/db')();
-global.db = db;
+//var db = require('./models/db')();
+//global.db = db;
+//
 
 //all routes
 var routes = require('./routes/index');
-var user = require('./routes/user');
+var user = require('./routes/app/user');
 var article = require('./routes/admin/article');
 var articleCategory = require('./routes/admin/articleCategory');
 var articleComment = require('./routes/admin/articleComment');
 var articleTag = require('./routes/admin/articleTag');
-var articleTemplate = require('./routes/admin/articleTemplate');
+//var articleTemplate = require('./routes/admin/articleTemplate');
 
 var systemLog = require('./routes/admin/systemLog');
 
-var ad = require('./routes/ad');
-var file = require('./routes/file');
-var backup = require('./routes/backup');
+var ad = require('./routes/admin/ad');
+var file = require('./routes/admin/file');
+var backup = require('./routes/admin/backup');
 
-var adminuser = require('./routes/adminuser');
-var admingroup = require('./routes/admingroup');
+var adminuser = require('./routes/admin/adminuser');
+var admingroup = require('./routes/admin/admingroup');
 
 var io = require('socket.io')();
-var admin = require('./routes/admin')(io);
+var admin = require('./routes/admin/admin')(io);
 
 var multer = require('multer');
 var mongoose = require('mongoose');
@@ -87,9 +88,12 @@ app.use(function(req, res, next){
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+//文件上传功能
 //app.use(multer());
+
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static',express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 app.use('/login',routes); // 即为为路径 /login 设置路由
@@ -106,8 +110,7 @@ app.use('/admin/manage/article', article);
 app.use('/admin/manage/articleCategory', articleCategory);
 app.use('/admin/manage/articleComment', articleComment);
 app.use('/admin/manage/articleTag', articleTag);
-app.use('/admin/manage/articleTemplate',articleTemplate);
-
+//app.use('/admin/manage/articleTemplate',articleTemplate);
 
 //后台用户管理
 app.use('/admin/manage/adminUser', adminuser);
@@ -143,7 +146,7 @@ if (app.get('env') === 'development') {
 
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.render('public/error', {
       message: err.message,
       error: err
     });
@@ -154,7 +157,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
+  res.render('public/error', {
     message: err.message,
     error: {}
   });
